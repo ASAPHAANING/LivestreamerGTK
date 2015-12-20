@@ -4,13 +4,20 @@
     {
         class LiveStreamerGTK : Gtk.Window
         {
+
             string quality = "Source";
+            File database = File.new_for_path ("database.txt");
+
             public LiveStreamerGTK ()
             {
                 var grid = new Grid();
                 var button = new Button.with_label("Go");
                 var url = new EntryBuffer(null);
                 var text = new Entry.with_buffer (url);
+
+                string recent = readDatabase(database);
+                
+                text.set_text(recent);
                 ListStore list_store = new Gtk.ListStore (1, typeof (string));
                 TreeIter iter;
                 list_store.append (out iter);
@@ -33,12 +40,12 @@
                 box.active = 0;
                 
                 box.changed.connect (() => {
-                Value val1;
-                
-                box.get_active_iter (out iter);
-                list_store.get_value (iter, 0, out val1);
-                quality = (string) val1;
-                });
+                    Value val1;
+                    
+                    box.get_active_iter (out iter);
+                    list_store.get_value (iter, 0, out val1);
+                    quality = (string) val1;
+                    });
 
                 button.clicked.connect (launchLiveStreamer);
                 text.activate.connect (launchLiveStreamerText);
@@ -55,9 +62,18 @@
 
             public void launchLiveStreamerText (Entry entry)
             {
-            unowned string str = entry.get_text ();
-            if(str != "") { stdout.printf ("%s\n", str); }
-            mainLoop(str,quality);
+                unowned string str = entry.get_text ();
+                try {
+                if(str != "") { stdout.printf ("%s\n", str); }
+                if(database.query_exists ()) { database.delete(); }
+                var dos = new DataOutputStream (database.create (FileCreateFlags.REPLACE_DESTINATION));
+                dos.put_string(entry.get_text());
+                }
+                catch (Error e)
+                {
+                    return;
+                }
+                mainLoop(str,quality);
             }
 
             public void launchLiveStreamer (Gtk.Button button)
@@ -66,18 +82,15 @@
                 //stdout.printf("%s\n", output);            
             }
 
-            
-
-
             public static int main (string[] args) {
-            Gtk.init (ref args);
+                Gtk.init (ref args);
 
-            var app = new LiveStreamerGTK();
+                var app = new LiveStreamerGTK();
 
-            app.destroy.connect (Gtk.main_quit);
-            app.show_all ();
-            Gtk.main ();
-            return 0;
+                app.destroy.connect (Gtk.main_quit);
+                app.show_all ();
+                Gtk.main ();
+                return 0;
+            }
         }
     }
-}

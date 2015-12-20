@@ -1,1 +1,2 @@
 Quit application after launching livestreamer
+Local database of recently watched.
