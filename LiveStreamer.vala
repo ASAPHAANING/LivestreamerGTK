@@ -4,7 +4,7 @@
     {
         class LiveStreamerGTK : Gtk.Window
         {
-            string quality;
+            string quality = "Source";
             public LiveStreamerGTK ()
             {
                 var grid = new Grid();
@@ -23,6 +23,8 @@
                 list_store.set (iter, 0, "Low", -1);
                 list_store.append (out iter);
                 list_store.set (iter, 0, "Mobile", -1);
+                list_store.append (out iter);
+                list_store.set (iter, 0, "Audio", -1);
                 ComboBox box = new Gtk.ComboBox.with_model (list_store);
                 
                 Gtk.CellRendererText renderer = new Gtk.CellRendererText ();
@@ -37,6 +39,7 @@
                 list_store.get_value (iter, 0, out val1);
                 quality = (string) val1;
                 });
+
                 button.clicked.connect (launchLiveStreamer);
                 text.activate.connect (launchLiveStreamerText);
                 grid.attach(text,0,0,200,10);
@@ -54,7 +57,7 @@
             {
             unowned string str = entry.get_text ();
             if(str != "") { stdout.printf ("%s\n", str); }
-            mainLoop(str);
+            mainLoop(str,quality);
             }
 
             public void launchLiveStreamer (Gtk.Button button)

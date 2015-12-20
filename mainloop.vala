@@ -1,9 +1,19 @@
-public void mainLoop (string s)
+public void mainLoop (string s, string q)
             {
+                string quality = q;
+                switch (q)
+                {
+                    case "Source":  quality = "best";   break;
+                    case "High":    quality = "high";   break; 
+                    case "Medium":  quality = "medium"; break;
+                    case "Low":     quality = "low";    break;
+                    case "Mobile":  quality = "mobile"; break;
+                    case "Audio":   quality = "audio";  break;
+                }
                 string url = s;
                 MainLoop loop = new MainLoop ();
                 try {
-                string[] spawn_args = {"livestreamer", "-p=mpv", "--ringbuffer-size=32M", "--player-passthrough", "hls", "--hls-segment-threads", "3", url, "best"};
+                string[] spawn_args = {"livestreamer", "-p=mpv", "--ringbuffer-size=32M", "--player-passthrough", "hls", "--hls-segment-threads", "3", url, quality};
                 string[] spawn_env = Environ.get ();
                 Pid child_pid;
                 
